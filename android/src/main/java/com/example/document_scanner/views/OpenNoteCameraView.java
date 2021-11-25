@@ -677,75 +677,13 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
     }
 
     public void saveDocument(ScannedDocument scannedDocument) {
-
-        Mat doc = (scannedDocument.processed != null) ? scannedDocument.processed : scannedDocument.original;
-
-        Intent intent = mActivity.getIntent();
-        boolean isIntent = false;
-        Uri fileUri = null;
-
-        String fileName = this.saveToDirectory(doc);
-        String initialFileName = this.saveToDirectory(scannedDocument.original);
-
         Map data = new HashMap();
 
         if (this.listener != null) {
-            data.put("height", scannedDocument.heightWithRatio);
-            data.put("width", scannedDocument.widthWithRatio);
-            data.put("croppedImage", "file://" + fileName);
-            data.put("initialImage", "file://" + initialFileName);
             data.put("rectangleCoordinates", scannedDocument.previewPointsAsHash());
-
-
-
             this.listener.onPictureTaken(data);
         }
-
-        if (isIntent) {
-            InputStream inputStream = null;
-            OutputStream realOutputStream = null;
-            try {
-                inputStream = new FileInputStream(fileName);
-                realOutputStream = mActivity.getContentResolver().openOutputStream(fileUri);
-                // Transfer bytes from in to out
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = inputStream.read(buffer)) > 0) {
-                    realOutputStream.write(buffer, 0, len);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            } finally {
-                try {
-                    inputStream.close();
-                    realOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        Log.d(TAG, "wrote: " + fileName);
-
-        if (isIntent) {
-            new File(fileName).delete();
-            mActivity.setResult(Activity.RESULT_OK, intent);
-            mActivity.finish();
-        } else {
-            animateDocument(fileName, scannedDocument);
-//            addImageToGallery(fileName, mContext);
-        }
-
-        // Record goal "PictureTaken"
-        // ((OpenNoteScannerApplication) getApplication()).getTracker().trackGoal(1);
-
         refreshCamera();
-
     }
 
     private void animateDocument(String filename, ScannedDocument quadrilateral) {
@@ -992,7 +930,7 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
     public int parsedOverlayColor() {
         {
             if(this.overlayColor == null){
-                return Color.argb(180, 66, 165, 245);
+                return Color.argb(0, 66, 165, 245);
             }
             Pattern c = Pattern.compile("rgba *\\( *([0-9]+), *([0-9]+), *([0-9]+), *([0-9]\\.?[0-9]?)*\\)");
             Matcher m = c.matcher(this.overlayColor);
@@ -1002,7 +940,7 @@ public class OpenNoteCameraView extends JavaCameraView implements PictureCallbac
                         Integer.valueOf(m.group(2)), Integer.valueOf(m.group(3)));
             }
 
-            return Color.argb(180, 66, 165, 245);
+            return Color.argb(0, 66, 165, 245);
 
         }
     }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:document_scanner/document_scanner.dart';
@@ -13,7 +11,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  File? scannedDocument;
   Future<PermissionStatus>? cameraPermissionFuture;
 
   @override
@@ -40,42 +37,16 @@ class _MyAppState extends State<MyApp> {
                       Column(
                         children: <Widget>[
                           Expanded(
-                            child: scannedDocument != null
-                                ? Image(
-                                    image: FileImage(scannedDocument!),
-                                  )
-                                : DocumentScanner(
-                                    // documentAnimation: false,
-                                    noGrayScale: true,
-                                    onDocumentScanned:
-                                        (ScannedImage scannedImage) {
+                            child: RectangleDetect(
+                                    onRectangleDetected:
+                                        (RectangleCoordinates rectangle) {
                                       print("document : " +
-                                          scannedImage.croppedImage!);
-
-                                      setState(() {
-                                        scannedDocument = scannedImage
-                                            .getScannedDocumentAsFile();
-                                        // imageLocation = image;
-                                      });
+                                          rectangle.toJson());
                                     },
                                   ),
                           ),
                         ],
                       ),
-                      scannedDocument != null
-                          ? Positioned(
-                              bottom: 20,
-                              left: 0,
-                              right: 0,
-                              child: RaisedButton(
-                                  child: Text("retry"),
-                                  onPressed: () {
-                                    setState(() {
-                                      scannedDocument = null;
-                                    });
-                                  }),
-                            )
-                          : Container(),
                     ],
                   );
                 else

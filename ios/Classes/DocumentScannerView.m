@@ -55,7 +55,7 @@
 //    NSLog(@"brightness : %f",channelBrightness);
 //    NSLog(@"contrast : %f",channelContrast);
          self.detectionRefreshRateInMS = 50;
-        self.overlayColor = [UIColor colorWithRed: 0.00 green: 0.00 blue: 0.00 alpha: 0.50];
+        self.overlayColor = [UIColor colorWithRed: 1.00 green: 0.00 blue: 0.00 alpha: 0.00];
         self.enableTorch = false;
         self.useFrontCam = false;
         self.useBase64 = false;

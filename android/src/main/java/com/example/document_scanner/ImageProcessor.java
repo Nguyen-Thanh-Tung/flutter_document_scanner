@@ -123,43 +123,25 @@ public class ImageProcessor extends Handler {
     }
 
     private void processPreviewFrame(PreviewFrame previewFrame) {
-
-        Result[] results = {};
-
         Mat frame = previewFrame.getFrame();
 
-        try {
-            results = zxing(frame);
-        } catch (ChecksumException | FormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        boolean qrOk = false;
-        String currentQR = null;
-
-        for (Result result : results) {
-            String qrText = result.getText();
-            if (Utils.isMatch(qrText, "^P.. V.. S[0-9]+") && checkQR(qrText)) {
-                Log.d(TAG, "QR Code valid: " + result.getText());
-                qrOk = true;
-                currentQR = qrText;
-                qrResultPoints = result.getResultPoints();
-                break;
-            } else {
-                Log.d(TAG, "QR Code ignored: " + result.getText());
-            }
-        }
-
-        boolean autoMode = previewFrame.isAutoMode();
-        boolean previewOnly = previewFrame.isPreviewOnly();
         boolean focused = mMainActivity.isFocused();
 
         if (detectPreviewDocument(frame) && focused) {
             numOfSquares++;
             if (numOfSquares == numOfRectangles) {
-                mMainActivity.requestPicture();
-                mMainActivity.waitSpinnerVisible();
+                Log.d(TAG, "processPicture - imported image " + frame.size().width + "x" + frame.size().height);
+                if (mBugRotate) {
+                    Core.flip(frame, frame, 1);
+                    Core.flip(frame, frame, 0);
+                }
+
+                ScannedDocument doc = detectDocument(frame);
+
+                mMainActivity.getHUD().clear();
+                mMainActivity.invalidateHUD();
+                mMainActivity.saveDocument(doc);
+                doc.release();
                 numOfSquares = 0;
             }
         } else {
