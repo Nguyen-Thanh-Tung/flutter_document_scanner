@@ -33,10 +33,10 @@ class RectangleCoordinates {
       );
 
   Map<String, dynamic> toMap() => {
-      "bottomLeft": bottomLeft == null ? null : bottomLeft!.toMap(),
-      "bottomRight": bottomRight == null ? null : bottomRight!.toMap(),
-      "topLeft": topLeft == null ? null : topLeft!.toMap(),
-      "topRight": topRight == null ? null : topRight!.toMap(),
+    "topLeft": topLeft == null ? null : topLeft!.toMap(),
+    "topRight": topRight == null ? null : topRight!.toMap(),
+    "bottomLeft": bottomLeft == null ? null : bottomLeft!.toMap(),
+    "bottomRight": bottomRight == null ? null : bottomRight!.toMap(),
   };
 }
 

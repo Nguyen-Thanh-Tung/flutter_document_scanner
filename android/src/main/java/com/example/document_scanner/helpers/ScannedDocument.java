@@ -43,20 +43,20 @@ public class ScannedDocument {
         HashMap rectangleCoordinates = new HashMap();
 
         HashMap topLeft = new HashMap();
-        topLeft.put("x", this.originalPoints[0].x);
-        topLeft.put("y", this.originalPoints[0].y);
+        topLeft.put("x", this.originalPoints[0].x / this.originalSize.width);
+        topLeft.put("y", this.originalPoints[0].y / this.originalSize.height);
 
         HashMap topRight = new HashMap();
-        topRight.put("x", this.originalPoints[1].x);
-        topRight.put("y", this.originalPoints[1].y);
+        topRight.put("x", this.originalPoints[1].x / this.originalSize.width);
+        topRight.put("y", this.originalPoints[1].y / this.originalSize.height);
 
         HashMap bottomRight = new HashMap();
-        bottomRight.put("x", this.originalPoints[2].x);
-        bottomRight.put("y", this.originalPoints[2].y);
+        bottomRight.put("x", this.originalPoints[2].x / this.originalSize.width);
+        bottomRight.put("y", this.originalPoints[2].y / this.originalSize.height);
 
         HashMap bottomLeft = new HashMap();
-        bottomLeft.put("x", this.originalPoints[3].x);
-        bottomLeft.put("y", this.originalPoints[3].y);
+        bottomLeft.put("x", this.originalPoints[3].x / this.originalSize.width);
+        bottomLeft.put("y", this.originalPoints[3].y / this.originalSize.height);
 
 
 

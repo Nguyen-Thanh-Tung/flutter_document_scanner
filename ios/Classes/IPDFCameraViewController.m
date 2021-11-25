@@ -194,7 +194,7 @@
     {
         if (_borderDetectFrame)
         {
-            _borderDetectLastRectangleFeature = [self biggestRectangleInRectangles:[[self highAccuracyRectangleDetector] featuresInImage:image]];
+            _borderDetectLastRectangleFeature = [self biggestRectangleInRectangles:[[self highAccuracyRectangleDetector] featuresInImage:image] withImage:image];
             _borderDetectFrame = NO;
         }
 
@@ -401,7 +401,7 @@
 
              if (weakSelf.isBorderDetectionEnabled && rectangleDetectionConfidenceHighEnough(weakSelf.imageDetectionConfidence))
              {
-                 CIRectangleFeature *rectangleFeature = [self biggestRectangleInRectangles:[[self highAccuracyRectangleDetector] featuresInImage:enhancedImage]];
+                 CIRectangleFeature *rectangleFeature = [self biggestRectangleInRectangles:[[self highAccuracyRectangleDetector] featuresInImage:enhancedImage] withImage:enhancedImage];
 
                  if (rectangleFeature)
                  {
@@ -496,7 +496,7 @@
     return detector;
 }
 
-- (CIRectangleFeature *)biggestRectangleInRectangles:(NSArray *)rectangles
+- (CIRectangleFeature *)biggestRectangleInRectangles:(NSArray *)rectangles withImage:(CIImage*)image
 {
     if (![rectangles count]) return nil;
 
@@ -524,7 +524,7 @@
     }
 
     if (self.delegate) {
-        [self.delegate didDetectRectangle:biggestRectangle withType:[self typeForRectangle:biggestRectangle]];
+        [self.delegate didDetectRectangle:biggestRectangle withType:[self typeForRectangle:biggestRectangle] withImage:image];
     }
 
     return biggestRectangle;

@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, IPDFRectangeType)
 
 @protocol IPDFCameraViewControllerDelegate <NSObject>
 
-- (void) didDetectRectangle: (CIRectangleFeature*) rectangle withType: (IPDFRectangeType) type;
+- (void) didDetectRectangle: (CIRectangleFeature*) rectangle withType: (IPDFRectangeType) type withImage: (CIImage*) image;
 
 @end
 

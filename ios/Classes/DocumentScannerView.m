@@ -113,7 +113,7 @@
 //}
 
 
-- (void) didDetectRectangle:(CIRectangleFeature *)rectangle withType:(IPDFRectangeType)type {
+- (void) didDetectRectangle:(CIRectangleFeature *)rectangle withType:(IPDFRectangeType)type withImage:(CIImage *)image{
     switch (type) {
         case IPDFRectangeTypeGood:
             self.stableCounter ++;
@@ -131,11 +131,13 @@
         self.lastCaptureTime = [NSDate timeIntervalSinceReferenceDate];
         self.stableCounter = 0;
         //[self capture];
+        double width = image.extent.size.width;
+        double height = image.extent.size.height;
         id rectangleCoordinates = rectangle ? @{
-                                             @"topLeft": @{ @"y": @(rectangle.bottomLeft.x + 30), @"x": @(rectangle.bottomLeft.y)},
-                                             @"topRight": @{ @"y": @(rectangle.topLeft.x + 30), @"x": @(rectangle.topLeft.y)},
-                                             @"bottomLeft": @{ @"y": @(rectangle.bottomRight.x), @"x": @(rectangle.bottomRight.y)},
-                                             @"bottomRight": @{ @"y": @(rectangle.topRight.x), @"x": @(rectangle.topRight.y)},
+                                             @"topRight": @{ @"x": @((rectangle.topRight.x + 30)/width), @"y": @(1 - rectangle.topRight.y/height)},
+                                             @"topLeft": @{ @"x": @((rectangle.topLeft.x + 30)/width), @"y": @(1 - rectangle.topLeft.y/height)},
+                                             @"bottomRight": @{ @"x": @(rectangle.bottomRight.x/width), @"y": @(1 - rectangle.bottomRight.y/height)},
+                                             @"bottomLeft": @{ @"x": @(rectangle.bottomLeft.x/width), @"y": @(1 - rectangle.bottomLeft.y/height)},
                                              } : [NSNull null];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_flutterChannel invokeMethod:@"onPictureTaken" arguments:@{
