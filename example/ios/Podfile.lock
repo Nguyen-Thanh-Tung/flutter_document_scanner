@@ -2,27 +2,27 @@ PODS:
   - document_scanner (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_plugin_android_lifecycle (0.0.1):
+  - "permission_handler (5.1.0+2)":
     - Flutter
 
 DEPENDENCIES:
   - document_scanner (from `.symlinks/plugins/document_scanner/ios`)
   - Flutter (from `Flutter`)
-  - flutter_plugin_android_lifecycle (from `.symlinks/plugins/flutter_plugin_android_lifecycle/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
 
 EXTERNAL SOURCES:
   document_scanner:
     :path: ".symlinks/plugins/document_scanner/ios"
   Flutter:
     :path: Flutter
-  flutter_plugin_android_lifecycle:
-    :path: ".symlinks/plugins/flutter_plugin_android_lifecycle/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
 
 SPEC CHECKSUMS:
   document_scanner: 3b9b9257ec9fe5d7e1f2e1e249c0dd101246d790
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_plugin_android_lifecycle: 47de533a02850f070f5696a623995e93eddcdb9b
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
 
-PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
+PODFILE CHECKSUM: 5844bded81b002c6baded73bcf8e95a65f7b4bef
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1

@@ -55,7 +55,7 @@
 //    NSLog(@"brightness : %f",channelBrightness);
 //    NSLog(@"contrast : %f",channelContrast);
          self.detectionRefreshRateInMS = 50;
-        self.overlayColor = [UIColor colorWithRed: 1.00 green: 0.00 blue: 0.00 alpha: 0.50];
+        self.overlayColor = [UIColor colorWithRed: 0.00 green: 0.00 blue: 0.00 alpha: 0.50];
         self.enableTorch = false;
         self.useFrontCam = false;
         self.useBase64 = false;
@@ -130,7 +130,18 @@
         [NSDate timeIntervalSinceReferenceDate] > self.lastCaptureTime + self.durationBetweenCaptures) {
         self.lastCaptureTime = [NSDate timeIntervalSinceReferenceDate];
         self.stableCounter = 0;
-        [self capture];
+        //[self capture];
+        id rectangleCoordinates = rectangle ? @{
+                                             @"topLeft": @{ @"y": @(rectangle.bottomLeft.x + 30), @"x": @(rectangle.bottomLeft.y)},
+                                             @"topRight": @{ @"y": @(rectangle.topLeft.x + 30), @"x": @(rectangle.topLeft.y)},
+                                             @"bottomLeft": @{ @"y": @(rectangle.bottomRight.x), @"x": @(rectangle.bottomRight.y)},
+                                             @"bottomRight": @{ @"y": @(rectangle.topRight.x), @"x": @(rectangle.topRight.y)},
+                                             } : [NSNull null];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_flutterChannel invokeMethod:@"onPictureTaken" arguments:@{
+                @"rectangleCoordinates": rectangleCoordinates
+                }];
+        });
     }
 }
 - (void) onPictureTaken: (NSDictionary*) result {
