@@ -1,80 +1,35 @@
 package com.example.document_scanner;
 
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
-import android.util.Log;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-
-import io.flutter.app.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
-import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+
+import com.example.document_scanner.helpers.Quadrilateral;
+import com.example.document_scanner.helpers.*;
 
 
 public class DocumentScannerPlugin
-        implements Application.ActivityLifecycleCallbacks,
-        FlutterPlugin,
-        ActivityAware,
-        DefaultLifecycleObserver, MethodChannel.MethodCallHandler {
-  static final int CREATED = 1;
-  static final int STARTED = 2;
-  static final int RESUMED = 3;
-  static final int PAUSED = 4;
-  static final int STOPPED = 5;
-  static final int DESTROYED = 6;
-  private final AtomicInteger state = new AtomicInteger(0);
-  private int registrarActivityHashCode;
-  private FlutterPluginBinding pluginBinding;
-  private Lifecycle lifecycle;
+        implements FlutterPlugin, MethodChannel.MethodCallHandler {
   static MethodChannel methodChannel;
-
-  private static final String VIEW_TYPE = "document_scanner";
-
-//    @Override
-//  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-////    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "document_scanner");
-////    channel.setMethodCallHandler(new DocumentScannerPlugin());
-//    flutterPluginBinding.getPlatformViewRegistry().registerViewFactory("document_scanner",new DocumentScannerViewManager(flutterPluginBinding.));
-//
-//
-//  }
-
-
-
-  public static void registerWith(Registrar registrar) {
-
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "document_scanner");
-    channel.setMethodCallHandler(new DocumentScannerPlugin());
-methodChannel = channel;
-    if (registrar.activity() == null) {
-      // When a background flutter view tries to register the plugin, the registrar has no activity.
-      // We stop the registration process as this plugin is foreground only.
-      return;
-    }
-    final DocumentScannerPlugin plugin = new DocumentScannerPlugin(registrar.activity());
-    registrar.activity().getApplication().registerActivityLifecycleCallbacks(plugin);
-    registrar
-            .platformViewRegistry()
-            .registerViewFactory(
-                    VIEW_TYPE,
-                    new DocumentScannerFactory(plugin.state, registrar.messenger(), null, null, registrar, -1,registrar.activity(),channel));
-  }
-
   public DocumentScannerPlugin() {}
 
   // FlutterPlugin
-
-
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
 
@@ -82,241 +37,198 @@ methodChannel = channel;
     channel.setMethodCallHandler(new DocumentScannerPlugin());
 
     methodChannel= channel;
-    pluginBinding = binding;
   }
 
   @Override
   public void onDetachedFromEngine(FlutterPluginBinding binding) {
-    pluginBinding = null;
+    methodChannel.setMethodCallHandler(null);
   }
 
-  // ActivityAware
-
-  @Override
-  public void onAttachedToActivity(ActivityPluginBinding binding) {
-    lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding);
-
-
-
-
-    lifecycle.addObserver(this);
-    pluginBinding
-            .getPlatformViewRegistry()
-            .registerViewFactory(
-                    VIEW_TYPE,
-                    new DocumentScannerFactory(
-                            state,
-                            pluginBinding.getBinaryMessenger(),
-                            binding.getActivity().getApplication(),
-                            lifecycle,
-                            null,
-                            binding.getActivity().hashCode(),binding.getActivity(),methodChannel));
-  }
-
-  @Override
-  public void onDetachedFromActivity() {
-    lifecycle.removeObserver(this);
-  }
-
-  @Override
-  public void onDetachedFromActivityForConfigChanges() {
-    this.onDetachedFromActivity();
-  }
-
-  @Override
-  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-    lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding);
-    lifecycle.addObserver(this);
-  }
-
-  // DefaultLifecycleObserver methods
-
-  @Override
-  public void onCreate(@NonNull LifecycleOwner owner) {
-    state.set(CREATED);
-  }
-
-  @Override
-  public void onStart(@NonNull LifecycleOwner owner) {
-    state.set(STARTED);
-  }
-
-  @Override
-  public void onResume(@NonNull LifecycleOwner owner) {
-    state.set(RESUMED);
-  }
-
-  @Override
-  public void onPause(@NonNull LifecycleOwner owner) {
-    state.set(PAUSED);
-  }
-
-  @Override
-  public void onStop(@NonNull LifecycleOwner owner) {
-    state.set(STOPPED);
-  }
-
-  @Override
-  public void onDestroy(@NonNull LifecycleOwner owner) {
-    state.set(DESTROYED);
-  }
-
-  // Application.ActivityLifecycleCallbacks methods
-
-  @Override
-  public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    state.set(CREATED);
-  }
-
-  @Override
-  public void onActivityStarted(Activity activity) {
-
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    state.set(STARTED);
-  }
-
-  @Override
-  public void onActivityResumed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    state.set(RESUMED);
-  }
-
-  @Override
-  public void onActivityPaused(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    state.set(PAUSED);
-  }
-
-  @Override
-  public void onActivityStopped(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    state.set(STOPPED);
-  }
-
-  @Override
-  public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
-
-  @Override
-  public void onActivityDestroyed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
-    activity.getApplication().unregisterActivityLifecycleCallbacks(this);
-    state.set(DESTROYED);
-  }
-
-  private DocumentScannerPlugin(Activity activity) {
-
-    this.registrarActivityHashCode = activity.hashCode();
-  }
 
   @Override
   public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-    if (methodCall.method.equals("getPlatformVersion")) {
-      Log.d("debug","sucess");
-      Log.d("debug","success");
-      Log.d("debug","sucess");
-      Log.d("debug","success");
-      Log.d("debug","sucess");
-      Log.d("debug","success");
-      Log.d("debug","sucess");
-      result.success("Androiddd " + android.os.Build.VERSION.RELEASE);
+    if (methodCall.method.equals("getRectangle")) {
+      final byte[] imageData = methodCall.argument("imageData");
+      result.success(processImage(imageData));
+    } else if (methodCall.method.equals("getPlatformVersion")) {
+      result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else {
       result.notImplemented();
     }
   }
+
+  private HashMap processImage(byte[] imageData) {
+    Mat frame = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+    HashMap data = new HashMap();
+    if (detectPreviewDocument(frame)) {
+      ScannedDocument doc = detectDocument(frame);
+      data = doc.previewPointsAsHash();
+      doc.release();
+    }
+    frame.release();
+    return data;
+  }
+
+  private boolean detectPreviewDocument(Mat inputRgba) {
+    ArrayList<MatOfPoint> contours = findContours(inputRgba);
+
+    Quadrilateral quad = getQuadrilateral(contours, inputRgba.size());
+    return quad != null;
+  }
+
+  private ScannedDocument detectDocument(Mat inputRgba) {
+    ArrayList<MatOfPoint> contours = findContours(inputRgba);
+
+    ScannedDocument sd = new ScannedDocument(inputRgba);
+
+    sd.originalSize = inputRgba.size();
+    Quadrilateral quad = getQuadrilateral(contours, sd.originalSize);
+
+    double ratio = sd.originalSize.height / 500;
+    sd.heightWithRatio = Double.valueOf(sd.originalSize.width / ratio).intValue();
+    sd.widthWithRatio = Double.valueOf(sd.originalSize.height / ratio).intValue();
+
+    if (quad != null) {
+
+      sd.originalPoints = new Point[4];
+
+      sd.originalPoints[0] = new Point(sd.widthWithRatio - quad.points[3].y, quad.points[3].x); // Topleft
+      sd.originalPoints[1] = new Point(sd.widthWithRatio - quad.points[0].y, quad.points[0].x); // TopRight
+      sd.originalPoints[2] = new Point(sd.widthWithRatio - quad.points[1].y, quad.points[1].x); // BottomRight
+      sd.originalPoints[3] = new Point(sd.widthWithRatio - quad.points[2].y, quad.points[2].x); // BottomLeft
+      sd.quadrilateral = quad;
+    }
+    return sd;
+  }
+
+  private ArrayList<MatOfPoint> findContours(Mat src) {
+
+    Mat grayImage = null;
+    Mat cannedImage = null;
+    Mat resizedImage = null;
+
+    double ratio = src.size().height / 500;
+    int height = Double.valueOf(src.size().height / ratio).intValue();
+    int width = Double.valueOf(src.size().width / ratio).intValue();
+    Size size = new Size(width, height);
+
+    resizedImage = new Mat(size, CvType.CV_8UC4);
+    grayImage = new Mat(size, CvType.CV_8UC4);
+    cannedImage = new Mat(size, CvType.CV_8UC1);
+
+    Imgproc.resize(src, resizedImage, size);
+    Imgproc.cvtColor(resizedImage, grayImage, Imgproc.COLOR_RGBA2GRAY, 4);
+    Imgproc.GaussianBlur(grayImage, grayImage, new Size(5, 5), 0);
+    Imgproc.Canny(grayImage, cannedImage, 80, 100, 3, false);
+
+    ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+    Mat hierarchy = new Mat();
+
+    Imgproc.findContours(cannedImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+    hierarchy.release();
+
+    Collections.sort(contours, new Comparator<MatOfPoint>() {
+
+      @Override
+      public int compare(MatOfPoint lhs, MatOfPoint rhs) {
+        return Double.valueOf(Imgproc.contourArea(rhs)).compareTo(Imgproc.contourArea(lhs));
+      }
+    });
+
+    resizedImage.release();
+    grayImage.release();
+    cannedImage.release();
+
+    return contours;
+  }
+
+  private Quadrilateral getQuadrilateral(ArrayList<MatOfPoint> contours, Size srcSize) {
+
+    double ratio = srcSize.height / 500;
+    int height = Double.valueOf(srcSize.height / ratio).intValue();
+    int width = Double.valueOf(srcSize.width / ratio).intValue();
+    Size size = new Size(width, height);
+
+    for (MatOfPoint c : contours) {
+      MatOfPoint2f c2f = new MatOfPoint2f(c.toArray());
+      double peri = Imgproc.arcLength(c2f, true);
+      MatOfPoint2f approx = new MatOfPoint2f();
+      Imgproc.approxPolyDP(c2f, approx, 0.02 * peri, true);
+
+      Point[] points = approx.toArray();
+
+      // select biggest 4 angles polygon
+      // if (points.length == 4) {
+      Point[] foundPoints = sortPoints(points);
+
+      if (insideArea(foundPoints, size)) {
+
+        return new Quadrilateral(c, foundPoints);
+      }
+      // }
+    }
+
+    return null;
+  }
+
+  private Point[] sortPoints(Point[] src) {
+
+    ArrayList<Point> srcPoints = new ArrayList<>(Arrays.asList(src));
+
+    Point[] result = { null, null, null, null };
+
+    Comparator<Point> sumComparator = new Comparator<Point>() {
+      @Override
+      public int compare(Point lhs, Point rhs) {
+        return Double.valueOf(lhs.y + lhs.x).compareTo(rhs.y + rhs.x);
+      }
+    };
+
+    Comparator<Point> diffComparator = new Comparator<Point>() {
+
+      @Override
+      public int compare(Point lhs, Point rhs) {
+        return Double.valueOf(lhs.y - lhs.x).compareTo(rhs.y - rhs.x);
+      }
+    };
+
+    // top-left corner = minimal sum
+    result[0] = Collections.min(srcPoints, sumComparator);
+
+    // bottom-right corner = maximal sum
+    result[2] = Collections.max(srcPoints, sumComparator);
+
+    // top-right corner = minimal diference
+    result[1] = Collections.min(srcPoints, diffComparator);
+
+    // bottom-left corner = maximal diference
+    result[3] = Collections.max(srcPoints, diffComparator);
+
+    return result;
+  }
+
+  private boolean insideArea(Point[] rp, Size size) {
+
+    int width = Double.valueOf(size.width).intValue();
+    int height = Double.valueOf(size.height).intValue();
+
+    int minimumSize = width / 10;
+
+    boolean isANormalShape = rp[0].x != rp[1].x && rp[1].y != rp[0].y && rp[2].y != rp[3].y && rp[3].x != rp[2].x;
+    boolean isBigEnough = ((rp[1].x - rp[0].x >= minimumSize) && (rp[2].x - rp[3].x >= minimumSize)
+            && (rp[3].y - rp[0].y >= minimumSize) && (rp[2].y - rp[1].y >= minimumSize));
+
+    double leftOffset = rp[0].x - rp[3].x;
+    double rightOffset = rp[1].x - rp[2].x;
+    double bottomOffset = rp[0].y - rp[1].y;
+    double topOffset = rp[2].y - rp[3].y;
+
+    boolean isAnActualRectangle = ((leftOffset <= minimumSize && leftOffset >= -minimumSize)
+            && (rightOffset <= minimumSize && rightOffset >= -minimumSize)
+            && (bottomOffset <= minimumSize && bottomOffset >= -minimumSize)
+            && (topOffset <= minimumSize && topOffset >= -minimumSize));
+
+    return isANormalShape && isAnActualRectangle && isBigEnough;
+  }
 }
-////package com.example.document_scanner;
-////
-////import androidx.annotation.NonNull;
-////import io.flutter.embedding.engine.plugins.FlutterPlugin;
-////import io.flutter.plugin.common.MethodCall;
-////import io.flutter.plugin.common.MethodChannel;
-////import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-////import io.flutter.plugin.common.MethodChannel.Result;
-////import io.flutter.plugin.common.PluginRegistry.Registrar;
-////
-////import com.example.document_scanner.views.MainView;
-////import com.example.document_scanner.views.OpenNoteCameraView;
-////
-////import android.app.Activity;
-////import android.content.Context;
-////
-////import java.util.HashMap;
-////
-/////** DocumentScannerPlugin */
-////public class DocumentScannerPlugin implements FlutterPlugin, MethodCallHandler {
-////  private MainView view = null;
-////
-////  @Override
-////  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-//////    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "document_scanner");
-//////    channel.setMethodCallHandler(new DocumentScannerPlugin());
-////    flutterPluginBinding.getPlatformViewRegistry().registerViewFactory("document_scanner",new DocumentScannerViewManager(flutterPluginBinding.));
-////
-////
-////  }
-////
-////  // This static function is optional and equivalent to onAttachedToEngine. It supports the old
-////  // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-////  // plugin registration via this function while apps migrate to use the new Android APIs
-////  // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
-////  //
-////  // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-////  // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-////  // depending on the user's project. onAttachedToEngine or registerWith must both be defined
-////  // in the same class.
-////  public static void registerWith(Registrar registrar) {
-//////    final MethodChannel channel = new MethodChannel(registrar.messenger(), "document_scanner");
-//////    channel.setMethodCallHandler(new DocumentScannerPlugin());
-////
-////registrar.platformViewRegistry().registerViewFactory("document_scanner",new DocumentScannerViewManager(registrar.));
-////  }
-////
-////  @Override
-////  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-////    if (call.method.equals("getPlatformVersion")) {
-////
-////      result.success("Androiddd " + android.os.Build.VERSION.RELEASE);
-////    } else {
-////      result.notImplemented();
-////    }
-////  }
-////
-////  @Override
-////  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-////  }
-////
-////  public void openScanner(Context context){
-//////    MainView.createInstance(context, );
-////
-////    view = MainView.getInstance();
-//////    view.setOnProcessingListener(new OpenNoteCameraView.OnProcessingListener() {
-//////      @Override
-//////      public void onProcessingChange(HashMap data) {
-//////        dispatchEvent(reactContext, "onProcessingChange", data);
-//////      }
-//////    });
-////
-//////    view.setOnScannerListener(new OpenNoteCameraView.OnScannerListener() {
-//////      @Override
-//////      public void onPictureTaken(WritableMap data) {
-//////        dispatchEvent(reactContext, "onPictureTaken", data);
-//////      }
-//////    });
-////
-//////    return view;
-////  }
-////}
