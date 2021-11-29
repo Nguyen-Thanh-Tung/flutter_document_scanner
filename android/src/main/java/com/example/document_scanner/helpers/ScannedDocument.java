@@ -1,7 +1,5 @@
 package com.example.document_scanner.helpers;
 
-
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
@@ -27,15 +25,6 @@ public class ScannedDocument {
 
     public ScannedDocument(Mat original) {
         this.original = original;
-    }
-
-    public Mat getProcessed() {
-        return processed;
-    }
-
-    public ScannedDocument setProcessed(Mat processed) {
-        this.processed = processed;
-        return this;
     }
 
     public HashMap previewPointsAsHash() {
