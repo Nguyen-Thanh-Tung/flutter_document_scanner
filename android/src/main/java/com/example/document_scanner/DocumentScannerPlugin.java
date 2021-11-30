@@ -83,6 +83,7 @@ public class DocumentScannerPlugin
     ArrayList<MatOfPoint> contours = findContours(inputRgba);
 
     Quadrilateral quad = getQuadrilateral(contours, inputRgba.size());
+    contours.removeAll(contours);
     return quad != null;
   }
 
@@ -103,9 +104,9 @@ public class DocumentScannerPlugin
       sd.originalPoints = new Point[4];
 
       sd.originalPoints[0] = new Point(sd.widthWithRatio - quad.points[3].y, quad.points[3].x); // Topleft
-      sd.originalPoints[1] = new Point(sd.widthWithRatio - quad.points[0].y, quad.points[0].x); // TopRight
+      sd.originalPoints[1] = new Point(sd.widthWithRatio - quad.points[2].y, quad.points[2].x); // TopRight
       sd.originalPoints[2] = new Point(sd.widthWithRatio - quad.points[1].y, quad.points[1].x); // BottomRight
-      sd.originalPoints[3] = new Point(sd.widthWithRatio - quad.points[2].y, quad.points[2].x); // BottomLeft
+      sd.originalPoints[3] = new Point(sd.widthWithRatio - quad.points[0].y, quad.points[0].x); // BottomLeft
       sd.quadrilateral = quad;
     }
     return sd;

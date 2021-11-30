@@ -54,22 +54,25 @@ public class ScannedDocument {
 
     public HashMap previewPointsAsHash() {
         HashMap rectangleCoordinates = new HashMap();
+        double ratio = this.originalSize.height / 500;
+        double width = this.originalSize.width;
+        double height = this.originalSize.height;
 
         HashMap topLeft = new HashMap();
-        topLeft.put("x", this.originalPoints[0].x / this.originalSize.width);
-        topLeft.put("y", this.originalPoints[0].y / this.originalSize.height);
+        topLeft.put("x", this.originalPoints[0].y * ratio / width);
+        topLeft.put("y", 1 - this.originalPoints[0].x * ratio / height);
 
         HashMap topRight = new HashMap();
-        topRight.put("x", this.originalPoints[1].x / this.originalSize.width);
-        topRight.put("y", this.originalPoints[1].y / this.originalSize.height);
+        topRight.put("x", this.originalPoints[1].y * ratio / width);
+        topRight.put("y", 1 - this.originalPoints[1].x * ratio / height);
 
         HashMap bottomRight = new HashMap();
-        bottomRight.put("x", this.originalPoints[2].x / this.originalSize.width);
-        bottomRight.put("y", this.originalPoints[2].y / this.originalSize.height);
+        bottomRight.put("x", this.originalPoints[2].y * ratio / width);
+        bottomRight.put("y", 1 - this.originalPoints[2].x * ratio / height);
 
         HashMap bottomLeft = new HashMap();
-        bottomLeft.put("x", this.originalPoints[3].x / this.originalSize.width);
-        bottomLeft.put("y", this.originalPoints[3].y / this.originalSize.height);
+        bottomLeft.put("x", this.originalPoints[3].y * ratio / width);
+        bottomLeft.put("y", 1 - this.originalPoints[3].x * ratio / height);
 
         rectangleCoordinates.put("topLeft", topLeft);
         rectangleCoordinates.put("topRight", topRight);
