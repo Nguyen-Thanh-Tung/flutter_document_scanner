@@ -10,8 +10,13 @@ class RectangleDetect {
       'imageData': data,
     });
 
-    Map<String, dynamic> argsAsMap = Map<String, dynamic>.from(responseData);
-    RectangleCoordinates rectangleCoordinates = RectangleCoordinates.fromMap(argsAsMap);
-    return rectangleCoordinates;
+    try {
+      Map<String, dynamic> argsAsMap = Map<String, dynamic>.from(responseData);
+      RectangleCoordinates rectangleCoordinates = RectangleCoordinates.fromMap(argsAsMap);
+      return rectangleCoordinates;
+    } catch(e) {
+      print('Error: ' + e.toString());
+      return RectangleCoordinates(bottomLeft: Corner(x: 0, y: 1), bottomRight: Corner(x: 1, y: 1), topLeft: Corner(x: 0, y: 0), topRight: Corner(x: 1, y: 0));
+    }
   }
 }

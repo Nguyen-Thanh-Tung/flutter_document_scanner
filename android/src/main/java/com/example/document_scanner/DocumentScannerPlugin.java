@@ -56,13 +56,8 @@ public class DocumentScannerPlugin
   public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
     if (methodCall.method.equals("getRectangle")) {
       final byte[] imageData = methodCall.argument("imageData");
-      System.out.println("Run: " + imageData.length);
-      if (OpenCVLoader.initDebug()) {
-        HashMap responseData = processImage(imageData);
-        result.success(responseData);
-      } else {
-        result.success("OpenCV is not inited");
-      }
+      HashMap responseData = processImage(imageData);
+      result.success(responseData);
     } else if (methodCall.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else {
@@ -72,11 +67,13 @@ public class DocumentScannerPlugin
 
   private HashMap processImage(byte[] imageData) {
     Mat frame = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
-    HashMap data = new HashMap();
+    HashMap data;
     if (detectPreviewDocument(frame)) {
       ScannedDocument doc = detectDocument(frame);
       data = doc.previewPointsAsHash();
       doc.release();
+    } else {
+      data = ScannedDocument.initScannedDocument();
     }
     frame.release();
     return data;

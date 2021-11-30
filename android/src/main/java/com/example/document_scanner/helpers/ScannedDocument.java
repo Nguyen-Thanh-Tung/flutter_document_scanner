@@ -25,6 +25,33 @@ public class ScannedDocument {
         this.original = original;
     }
 
+    public static HashMap initScannedDocument() {
+        HashMap rectangleCoordinates = new HashMap();
+
+        HashMap topLeft = new HashMap();
+        topLeft.put("x", 0);
+        topLeft.put("y", 0);
+
+        HashMap topRight = new HashMap();
+        topRight.put("x", 1);
+        topRight.put("y", 0);
+
+        HashMap bottomRight = new HashMap();
+        bottomRight.put("x", 1);
+        bottomRight.put("y", 1);
+
+        HashMap bottomLeft = new HashMap();
+        bottomLeft.put("x", 0);
+        bottomLeft.put("y", 1);
+
+        rectangleCoordinates.put("topLeft", topLeft);
+        rectangleCoordinates.put("topRight", topRight);
+        rectangleCoordinates.put("bottomRight", bottomRight);
+        rectangleCoordinates.put("bottomLeft", bottomLeft);
+
+        return rectangleCoordinates;
+    }
+
     public HashMap previewPointsAsHash() {
         HashMap rectangleCoordinates = new HashMap();
 
@@ -43,8 +70,6 @@ public class ScannedDocument {
         HashMap bottomLeft = new HashMap();
         bottomLeft.put("x", this.originalPoints[3].x / this.originalSize.width);
         bottomLeft.put("y", this.originalPoints[3].y / this.originalSize.height);
-
-
 
         rectangleCoordinates.put("topLeft", topLeft);
         rectangleCoordinates.put("topRight", topRight);
