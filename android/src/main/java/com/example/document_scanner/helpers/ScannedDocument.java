@@ -14,8 +14,6 @@ public class ScannedDocument {
     public Mat original;
     public Mat processed;
     public Quadrilateral quadrilateral;
-    public Point[] previewPoints;
-    public Size previewSize;
     public Size originalSize;
 
     public Point[] originalPoints;
@@ -28,7 +26,6 @@ public class ScannedDocument {
     }
 
     public HashMap previewPointsAsHash() {
-        if (this.previewPoints == null) return null;
         HashMap rectangleCoordinates = new HashMap();
 
         HashMap topLeft = new HashMap();

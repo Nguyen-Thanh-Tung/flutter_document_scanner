@@ -9,6 +9,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.android.OpenCVLoader;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -27,7 +28,13 @@ import com.example.document_scanner.helpers.*;
 public class DocumentScannerPlugin
         implements FlutterPlugin, MethodChannel.MethodCallHandler {
   static MethodChannel methodChannel;
-  public DocumentScannerPlugin() {}
+  public DocumentScannerPlugin() {
+    if (OpenCVLoader.initDebug()) {
+      System.out.println("Success init opencv");
+    } else {
+      System.out.println("Error init opencv");
+    }
+  }
 
   // FlutterPlugin
   @Override
@@ -49,7 +56,13 @@ public class DocumentScannerPlugin
   public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
     if (methodCall.method.equals("getRectangle")) {
       final byte[] imageData = methodCall.argument("imageData");
-      result.success(processImage(imageData));
+      System.out.println("Run: " + imageData.length);
+      if (OpenCVLoader.initDebug()) {
+        HashMap responseData = processImage(imageData);
+        result.success(responseData);
+      } else {
+        result.success("OpenCV is not inited");
+      }
     } else if (methodCall.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else {
