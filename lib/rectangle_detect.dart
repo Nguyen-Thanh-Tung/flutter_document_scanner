@@ -3,16 +3,9 @@ import 'dart:typed_data';
 import 'package:document_scanner/rectangle_coordinates.dart';
 import 'package:flutter/services.dart';
 
-const String _methodChannelIdentifier = 'document_scanner';
-
 class RectangleDetect {
-
-  RectangleDetect._();
-
-  static final RectangleDetect instance = RectangleDetect._();
-  final MethodChannel _channel = const MethodChannel(_methodChannelIdentifier);
-
-  Future<dynamic> getRectangle(Uint8List data) async {
+  static Future<dynamic> getRectangle(Uint8List data) async {
+    const MethodChannel _channel = const MethodChannel('document_scanner');
     dynamic responseData =  await _channel.invokeMethod('getRectangle', <String, dynamic>{
       'imageData': data,
     });
