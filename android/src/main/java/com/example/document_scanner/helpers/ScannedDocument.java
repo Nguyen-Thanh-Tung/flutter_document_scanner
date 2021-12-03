@@ -29,20 +29,20 @@ public class ScannedDocument {
         HashMap rectangleCoordinates = new HashMap();
 
         HashMap topLeft = new HashMap();
-        topLeft.put("x", 0);
-        topLeft.put("y", 0);
+        topLeft.put("x", 0.0);
+        topLeft.put("y", 0.0);
 
         HashMap topRight = new HashMap();
-        topRight.put("x", 1);
-        topRight.put("y", 0);
+        topRight.put("x", 1.0);
+        topRight.put("y", 0.0);
 
         HashMap bottomRight = new HashMap();
-        bottomRight.put("x", 1);
-        bottomRight.put("y", 1);
+        bottomRight.put("x", 1.0);
+        bottomRight.put("y", 1.0);
 
         HashMap bottomLeft = new HashMap();
-        bottomLeft.put("x", 0);
-        bottomLeft.put("y", 1);
+        bottomLeft.put("x", 0.0);
+        bottomLeft.put("y", 1.0);
 
         rectangleCoordinates.put("topLeft", topLeft);
         rectangleCoordinates.put("topRight", topRight);

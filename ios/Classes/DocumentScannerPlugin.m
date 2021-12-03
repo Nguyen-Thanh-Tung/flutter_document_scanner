@@ -24,8 +24,8 @@
            double width = enhancedImage.extent.size.width;
            double height = enhancedImage.extent.size.height;
            id rectangleCoordinates = rectangleFeature ? @{
-                                                @"topRight": @{ @"x": @((rectangleFeature.topRight.x + 30)/width), @"y": @(1 - rectangleFeature.topRight.y/height)},
-                                                @"topLeft": @{ @"x": @((rectangleFeature.topLeft.x + 30)/width), @"y": @(1 - rectangleFeature.topLeft.y/height)},
+                                                @"topRight": @{ @"x": @(rectangleFeature.topRight.x/width), @"y": @(1 - rectangleFeature.topRight.y/height)},
+                                                @"topLeft": @{ @"x": @(rectangleFeature.topLeft.x/width), @"y": @(1 - rectangleFeature.topLeft.y/height)},
                                                 @"bottomRight": @{ @"x": @(rectangleFeature.bottomRight.x/width), @"y": @(1 - rectangleFeature.bottomRight.y/height)},
                                                 @"bottomLeft": @{ @"x": @(rectangleFeature.bottomLeft.x/width), @"y": @(1 - rectangleFeature.bottomLeft.y/height)},
                                                 } : [NSNull null];
